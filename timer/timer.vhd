@@ -1,0 +1,40 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity timer is
+  generic (
+    duration_sec : integer;
+    frequency_hz : integer
+  );
+  port (
+    reset  : in std_logic;
+    clock  : in std_logic;
+    enable : in std_logic;
+    ended  : out std_logic
+  );
+end entity;
+architecture behavioral of timer is
+  constant required_width : integer := 32;
+
+  component counter is
+    generic (
+      data_width : integer := 8
+    );
+    port (
+      reset : in std_logic;
+      clock : in std_logic;
+      count : out std_logic_vector(data_width-1 downto 0)
+    );
+  end component;
+
+  signal anded_clock : std_logic := '0';
+  signal count_reg   : std_logic_vector(required_width-1 downto 0);
+begin
+  anded_clock <= clock and enable;
+  ended       <= '1' when unsigned(count_reg) > (duration_sec*frequency_hz) else '0';
+  
+  counter_instance : counter
+    generic map (required_width)
+    port map (reset, anded_clock, count_reg);
+end architecture;

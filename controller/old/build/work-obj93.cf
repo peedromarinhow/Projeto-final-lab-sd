@@ -1,0 +1,7 @@
+v 4
+file . "../tb.vhd" "923affc7cf833ca393f1e7df86dbe1349caf30c6" "20250128174114.578":
+  entity tb at 1( 0) + 0 on 65;
+  architecture test of tb at 8( 99) + 0 on 66;
+file . "../controller.vhd" "4656dc4f1f0165c614ed229847f56701cf64ee3d" "20250128174114.547":
+  entity controller at 1( 0) + 0 on 63;
+  architecture fsm of controller at 24( 592) + 0 on 64;

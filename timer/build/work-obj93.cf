@@ -1,0 +1,10 @@
+v 4
+file . "../../counter/counter.vhd" "6dbc3e1ec910ac827621f9086effa8c4ec77609b" "20250129163447.077":
+  entity counter at 1( 0) + 0 on 265;
+  architecture behavioral of counter at 15( 283) + 0 on 266;
+file . "../tb.vhd" "10e165fa9afd50cc86ebed5dc4f6585a5561524f" "20250129163447.053":
+  entity tb at 1( 0) + 0 on 263;
+  architecture test of tb at 8( 99) + 0 on 264;
+file . "../timer.vhd" "d44f2bdafd3fe2bc7d6e637216b7c64e7b1084cf" "20250129163447.017":
+  entity timer at 1( 0) + 0 on 261;
+  architecture behavioral of timer at 17( 308) + 0 on 262;

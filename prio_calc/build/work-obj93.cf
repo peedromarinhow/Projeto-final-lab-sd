@@ -1,0 +1,10 @@
+v 4
+file . "../../counter/counter.vhd" "6dbc3e1ec910ac827621f9086effa8c4ec77609b" "20250128185917.161":
+  entity counter at 1( 0) + 0 on 129;
+  architecture behavioral of counter at 15( 283) + 0 on 130;
+file . "../priority_calc.vhd" "d09c022cb704eb82eb01e17d8cb3bffbbec8e0c0" "20250128185917.110":
+  entity priority_calc at 1( 0) + 0 on 125;
+  architecture behavioral of priority_calc at 16( 294) + 0 on 126;
+file . "../tb.vhd" "4ab3843ebc3ecd8cbe31cb5d47b05a82852e93dc" "20250128185917.139":
+  entity tb at 1( 0) + 0 on 127;
+  architecture test of tb at 8( 99) + 0 on 128;

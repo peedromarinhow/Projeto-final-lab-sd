@@ -24,9 +24,6 @@ architecture test of tb is
       door_closed_end_of_travel_sensor : in std_logic;
       door_open_end_of_travel_sensor   : in std_logic;
 
-      hold_door_button  : in std_logic;
-      close_door_button : in std_logic;
-
       open_door : out std_logic;
 
       motor_forward : out std_logic;
@@ -42,9 +39,6 @@ architecture test of tb is
 
   signal door_closed_end_of_travel_sensor_input : std_logic := '0';
   signal door_open_end_of_travel_sensor_input   : std_logic := '0';
-
-  signal hold_door_button_input  : std_logic := '0';
-  signal close_door_button_input : std_logic := '0';
 
   signal open_door_output : std_logic;
 
@@ -69,9 +63,6 @@ begin
 
               door_closed_end_of_travel_sensor_input,
               door_open_end_of_travel_sensor_input,
-
-              hold_door_button_input,
-              close_door_button_input,
 
               open_door_output,
 

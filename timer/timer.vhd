@@ -29,7 +29,7 @@ architecture behavioral of timer is
   end component;
 
   signal anded_clock : std_logic := '0';
-  signal count_reg   : std_logic_vector(required_width-1 downto 0);
+  signal count_reg   : std_logic_vector(required_width-1 downto 0) := (others => '0');
 begin
   anded_clock <= clock and enable;
   ended       <= '1' when unsigned(count_reg) > (duration_sec*frequency_hz) else '0';

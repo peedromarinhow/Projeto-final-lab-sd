@@ -3,6 +3,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity datapath is
+  generic (
+    num_floors : integer := 10
+  );
   port (
     reset : in std_logic;
     clock : in std_logic;
@@ -13,9 +16,6 @@ entity datapath is
 
     door_closed_end_of_travel_sensor : in std_logic;
     door_open_end_of_travel_sensor   : in std_logic;
-
-    hold_door_button  : in std_logic;
-    close_door_button : in std_logic;
 
     open_door     : out std_logic;
     motor_forward : out std_logic;
@@ -52,20 +52,6 @@ architecture rtl of datapath is
     );
   end component;
 
-  component reg is
-    generic (
-      data_width : natural := 8
-    );
-    port (
-      reset    : in  std_logic;
-      clock    : in  std_logic;
-      load     : in  std_logic;
-      data_in  : in  std_logic_vector(data_width-1 downto 0);
-      data_out : out std_logic_vector(data_width-1 downto 0)
-    );
-  end component;
-  signal debug_reg_data_out : std_logic_vector(7 downto 0);
-
   component controller is
     port (
       reset : in std_logic;
@@ -81,25 +67,16 @@ architecture rtl of datapath is
 
       door_closed_end_of_travel : in std_logic;
       door_open_end_of_travel   : in std_logic;
-  
-      hold_door_button  : in std_logic;
-      close_door_button : in std_logic;
 
       open_door     : out std_logic;
       motor_forward : out std_logic;
       motor_reverse : out std_logic;
-      arrived       : out std_logic;
   
       debug_state : out integer
     );
   end component;
   signal controller_called_eq_current_input : std_logic := '0';
   signal controller_called_gt_current_input : std_logic := '0';
-
-  signal controller_open_door_output     : std_logic;
-  signal controller_motor_forward_output : std_logic;
-  signal controller_motor_reverse_output : std_logic;
-  signal controller_arrived_output       : std_logic;
 
   signal inv_reset : std_logic := '0';
 begin
@@ -116,10 +93,6 @@ begin
     generic map (8)
     port map (called_floor, current_floor, controller_called_eq_current_input, controller_called_gt_current_input);
 
-  reg_instance : reg
-    generic map (8)
-    port map (reset, clock, controller_arrived_output, called_floor, debug_reg_data_out);
-
   controller_instance : controller
     port map (reset,
               clock,
@@ -135,19 +108,11 @@ begin
               door_closed_end_of_travel_sensor,
               door_open_end_of_travel_sensor,
 
-              hold_door_button,
-              close_door_button,
-
-              controller_open_door_output,
-              controller_motor_forward_output,
-              controller_motor_reverse_output,
-              controller_arrived_output,
+              open_door,
+              motor_forward,
+              motor_reverse,
 
               debug_controller_state);
-
-  open_door     <= controller_open_door_output;
-  motor_forward <= controller_motor_forward_output;
-  motor_reverse <= controller_motor_reverse_output;
 end architecture;
 
 

@@ -51,7 +51,7 @@ architecture test of tb is
 
   signal debug_controller_state_output : integer;
 
-  signal current_floor_number : unsigned(7 downto 0) := "00000000";
+  signal current_floor_number : unsigned(7 downto 0) := "00000001";
 begin
   run <= false after 600 sec;
   clk <= not clk after (0.5/frq) * 1 sec when run;
@@ -77,7 +77,8 @@ begin
             
               debug_controller_state_output);
 
-  called_floor_input  <= "00000001" after 60  sec, "00000000" after 130 sec;
+  called_floor_input <= "00000011" after 60  sec, "00000000" after 100 sec,
+                        "00000001" after 150  sec, "00000000" after 190 sec;
   -- current_floor_input <= "00000001" after 120 sec;
 
   door_process : process (clk)
@@ -107,21 +108,21 @@ begin
   end process;
 
   cabin_process : process (clk)
-    variable current_altitude : real := 0.0;
-    variable altitude_modulo  : real := 0.0;
+    variable current_floor_altitude : real := 0.0;
   begin
     if rising_edge(clk) then
-      altitude_modulo := current_altitude - floor(current_altitude);
       if motor_forward_output = '1' then
-        current_altitude := current_altitude + 0.01;
-        if altitude_modulo > 0.9 then
+        if current_floor_altitude < 0.9 then
+          current_floor_altitude := current_floor_altitude + 0.01;
+        else
+          current_floor_altitude := 0.0;
           current_floor_number <= current_floor_number + 1;
         end if;
       elsif motor_reverse_output = '1' then
-        if current_altitude > 0.1 then
-          current_altitude := current_altitude - 0.01;
-        end if;
-        if altitude_modulo < 0.1 then
+        if current_floor_altitude > 0.1 then
+          current_floor_altitude := current_floor_altitude - 0.01;
+        else
+          current_floor_altitude := 1.0;
           current_floor_number <= current_floor_number - 1;
         end if;
       end if;

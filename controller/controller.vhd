@@ -12,6 +12,7 @@ entity controller is
 
     open_door_timer_timeout  : in  std_logic;
     open_door_timer_enable   : out std_logic;
+    open_door_timer_reset    : out std_logic;
 
     door_closed_end_of_travel : in std_logic;
     door_open_end_of_travel   : in std_logic;
@@ -22,6 +23,7 @@ entity controller is
     open_door     : out std_logic;
     motor_forward : out std_logic;
     motor_reverse : out std_logic;
+    arrived       : out std_logic;
 
     debug_state : out integer
   );
@@ -37,6 +39,8 @@ architecture fsm of controller is
     state_closing_door,
 
     state_deciding,
+
+    state_arrived,
 
     state_moving_up,
     state_moving_down
@@ -66,9 +70,11 @@ begin
         next_state <= state_waiting_closed;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
+        arrived                <= '0';
 
       when state_waiting_closed =>
         if was_called = '0' then
@@ -78,9 +84,11 @@ begin
         end if;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
+        arrived                <= '0';
 
       when state_waiting_open =>
         if open_door_timer_timeout = '0' or hold_door_button = '1' then
@@ -90,9 +98,11 @@ begin
         end if;
 
         open_door_timer_enable <= '1';
+        open_door_timer_reset  <= '0';
         open_door              <= '1';
         motor_forward          <= '0';
         motor_reverse          <= '0';
+        arrived                <= '0';
 
       when state_opening_door =>
         if door_open_end_of_travel = '0' then
@@ -102,9 +112,11 @@ begin
         end if;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '1';
         open_door              <= '1';
         motor_forward          <= '0';
         motor_reverse          <= '0';
+        arrived                <= '0';
 
       when state_closing_door =>
         if door_closed_end_of_travel = '0' then
@@ -116,9 +128,11 @@ begin
         end if;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
+        arrived                <= '0';
 
       when state_deciding =>
         if called_floor_eq_current = '1' then
@@ -130,33 +144,49 @@ begin
         end if;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
+        arrived                <= '0';
+
+      when state_arrived =>
+        next_state <= state_opening_door;
+
+        open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
+        open_door              <= '0';
+        motor_forward          <= '0';
+        motor_reverse          <= '0';
+        arrived                <= '1';
 
       when state_moving_up =>
         if called_floor_eq_current = '0' then
           next_state <= state_moving_up;
         else
-          next_state <= state_opening_door;
+          next_state <= state_arrived;
         end if;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
         open_door              <= '0';
         motor_forward          <= '1';
         motor_reverse          <= '0';
+        arrived                <= '0';
 
       when state_moving_down =>
         if called_floor_eq_current = '0' then
           next_state <= state_moving_down;
         else
-          next_state <= state_opening_door;
+          next_state <= state_arrived;
         end if;
 
         open_door_timer_enable <= '0';
+        open_door_timer_reset  <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '1';
+        arrived                <= '0';
 
     end case;
   end process;

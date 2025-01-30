@@ -1,28 +1,28 @@
 v 4
-file . "../../controller/controller.vhd" "b7e82e0b8b82a34d6e0b1f8810bc8ce29b5ee26f" "20250130132535.952":
-  entity controller at 1( 0) + 0 on 1401;
-  architecture fsm of controller at 31( 787) + 0 on 1402;
-file . "../../counter/counter.vhd" "6dbc3e1ec910ac827621f9086effa8c4ec77609b" "20250130132535.851":
-  entity counter at 1( 0) + 0 on 1393;
-  architecture behavioral of counter at 15( 283) + 0 on 1394;
-file . "../../prio_calc/prio_calc.vhd" "da88e6c868f337ad02ec72d0a652525fc5d9ec36" "20250130125705.600":
-  entity prio_calc at 1( 0) + 0 on 1299;
-  architecture behavioral of prio_calc at 16( 286) + 0 on 1300;
-file . "../datapath.vhd" "4e35189b8f5e7ee88114ca09b4fb1ef27903450f" "20250130132535.799":
-  entity datapath at 1( 0) + 0 on 1389;
-  architecture rtl of datapath at 26( 631) + 0 on 1390;
-file . "../../timer/timer.vhd" "d44f2bdafd3fe2bc7d6e637216b7c64e7b1084cf" "20250130132535.874":
-  entity timer at 1( 0) + 0 on 1395;
-  architecture behavioral of timer at 17( 308) + 0 on 1396;
-file . "../tb.vhd" "28e94d241264a0d401daf252dfe9f7afa7ecdaea" "20250130132535.826":
-  entity tb at 1( 0) + 0 on 1391;
-  architecture test of tb at 9( 124) + 0 on 1392;
+file . "../../reg/reg.vhd" "0a879c9983300887bd98df094ebb08b4e0655840" "20250130145901.595":
+  entity reg at 1( 0) + 0 on 1657;
+  architecture behavioral of reg at 17( 341) + 0 on 1658;
+file . "../../comp/comp.vhd" "66ec479df584917cc558e999f1d4ccc52ac7c482" "20250130145901.577":
+  entity comp at 1( 0) + 0 on 1655;
+  architecture rtl of comp at 15( 280) + 0 on 1656;
 file . "../../priority_calc/priority_calc.vhd" "d09c022cb704eb82eb01e17d8cb3bffbbec8e0c0" "20250128192756.181":
   entity priority_calc at 1( 0) + 0 on 19;
   architecture behavioral of priority_calc at 16( 294) + 0 on 20;
-file . "../../comp/comp.vhd" "66ec479df584917cc558e999f1d4ccc52ac7c482" "20250130132535.898":
-  entity comp at 1( 0) + 0 on 1397;
-  architecture rtl of comp at 15( 280) + 0 on 1398;
-file . "../../reg/reg.vhd" "0a879c9983300887bd98df094ebb08b4e0655840" "20250130132535.922":
-  entity reg at 1( 0) + 0 on 1399;
-  architecture behavioral of reg at 17( 341) + 0 on 1400;
+file . "../tb.vhd" "ad55f3140516e95d69339265849109efe82f5f02" "20250130145901.482":
+  entity tb at 1( 0) + 0 on 1649;
+  architecture test of tb at 9( 124) + 0 on 1650;
+file . "../../timer/timer.vhd" "d44f2bdafd3fe2bc7d6e637216b7c64e7b1084cf" "20250130145901.553":
+  entity timer at 1( 0) + 0 on 1653;
+  architecture behavioral of timer at 17( 308) + 0 on 1654;
+file . "../datapath.vhd" "01e0476c489300ab442c235b640221f045eb27a7" "20250130145901.437":
+  entity datapath at 1( 0) + 0 on 1647;
+  architecture rtl of datapath at 27( 666) + 0 on 1648;
+file . "../../prio_calc/prio_calc.vhd" "da88e6c868f337ad02ec72d0a652525fc5d9ec36" "20250130125705.600":
+  entity prio_calc at 1( 0) + 0 on 1299;
+  architecture behavioral of prio_calc at 16( 286) + 0 on 1300;
+file . "../../counter/counter.vhd" "6dbc3e1ec910ac827621f9086effa8c4ec77609b" "20250130145901.520":
+  entity counter at 1( 0) + 0 on 1651;
+  architecture behavioral of counter at 15( 283) + 0 on 1652;
+file . "../../controller/controller.vhd" "b7e82e0b8b82a34d6e0b1f8810bc8ce29b5ee26f" "20250130145901.617":
+  entity controller at 1( 0) + 0 on 1659;
+  architecture fsm of controller at 31( 787) + 0 on 1660;

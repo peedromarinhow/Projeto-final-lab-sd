@@ -7,6 +7,7 @@ entity datapath is
     reset : in std_logic;
     clock : in std_logic;
 
+    was_called    : in std_logic;
     called_floor  : in std_logic_vector(7 downto 0);
     current_floor : in std_logic_vector(7 downto 0);
 
@@ -92,7 +93,6 @@ architecture rtl of datapath is
       debug_state : out integer
     );
   end component;
-  signal controller_was_called_input        : std_logic := '0';
   signal controller_called_eq_current_input : std_logic := '0';
   signal controller_called_gt_current_input : std_logic := '0';
 
@@ -124,7 +124,7 @@ begin
     port map (reset,
               clock,
 
-              controller_was_called_input,
+              was_called,
               controller_called_eq_current_input,
               controller_called_gt_current_input,
 
@@ -144,8 +144,6 @@ begin
               controller_arrived_output,
 
               debug_controller_state);
-
-  controller_was_called_input <= '1' when unsigned(called_floor) /= 0 else '0';
 
   open_door     <= controller_open_door_output;
   motor_forward <= controller_motor_forward_output;

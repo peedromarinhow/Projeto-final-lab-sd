@@ -46,10 +46,8 @@ architecture test of tb is
   signal motor_reverse_output : std_logic;
 
   signal debug_controller_state_output : integer;
-
-  signal current_floor_number : unsigned(7 downto 0) := "00000001";
 begin
-  run <= false after 3000 sec;
+  run <= false after 5000 sec;
   clk <= not clk after (0.5/frq) * 1 sec when run;
   rst <= '1' after 1 sec;
 
@@ -73,13 +71,13 @@ begin
 
   process
     type sequence_type is array (0 to 9) of integer;
-    constant sequence : sequence_type := (1, 4, 2, 3, 7, 8, 5, 6, 9, 1);
+    constant sequence : sequence_type := (1, 2, 1, 2, 7, 8, 5, 6, 9, 1);
   begin
     wait for 50 sec;
     for i in sequence'range loop
       was_called_input <= '1' after 0 sec, '0' after 1 sec;
       called_floor_input <= std_logic_vector(to_unsigned(sequence(i), 8));
-      wait for 150 sec;
+      wait for 300 sec;
     end loop;
     wait;
   end process;
@@ -111,27 +109,26 @@ begin
   end process;
 
   cabin_process : process (clk)
-    constant increment_per_tick     : real := 0.01;
-    variable current_floor_altitude : real := 0.0;
+    constant increment_per_tick : real := 0.002;
+    variable current_floor      : real := 0.0;
+    variable current_altitude   : real := 0.0;
+    variable current_delta      : real := 0.0;
   begin
     if rising_edge(clk) then
+      current_altitude := current_altitude + current_delta;
       if motor_forward_output = '1' then
-        if current_floor_altitude < 0.9 then
-          current_floor_altitude := current_floor_altitude + increment_per_tick;
-        else
-          current_floor_altitude := 0.0;
-          current_floor_number <= current_floor_number + 1;
-        end if;
+        current_delta := increment_per_tick;
       elsif motor_reverse_output = '1' then
-        if current_floor_altitude > 0.1 then
-          current_floor_altitude := current_floor_altitude - increment_per_tick;
-        else
-          current_floor_altitude := 1.0;
-          current_floor_number <= current_floor_number - 1;
-        end if;
+        current_delta := -increment_per_tick;
+      else
+        current_delta := 0.0;
       end if;
 
-      current_floor_input <= std_logic_vector(current_floor_number);
+      if (current_altitude - floor(current_altitude)) < 0.1 then
+        current_floor := floor(current_altitude);
+      end if;
+
+      current_floor_input <= std_logic_vector(to_unsigned(integer(current_floor), 8));
     end if;
 
   end process;

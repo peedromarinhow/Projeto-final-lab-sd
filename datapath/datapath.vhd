@@ -78,6 +78,10 @@ architecture rtl of datapath is
   signal controller_called_eq_current_input : std_logic := '0';
   signal controller_called_gt_current_input : std_logic := '0';
 
+  signal controller_open_door_output     : std_logic;
+  signal controller_motor_forward_output : std_logic;
+  signal controller_motor_reverse_output : std_logic;
+
   signal inv_reset : std_logic := '0';
 begin
   inv_reset <= not reset;
@@ -108,11 +112,15 @@ begin
               door_closed_end_of_travel_sensor,
               door_open_end_of_travel_sensor,
 
-              open_door,
-              motor_forward,
-              motor_reverse,
+              controller_open_door_output,
+              controller_motor_forward_output,
+              controller_motor_reverse_output,
 
               debug_controller_state);
+
+  open_door     <= controller_open_door_output;
+  motor_forward <= controller_motor_forward_output;
+  motor_reverse <= controller_motor_reverse_output;
 end architecture;
 
 

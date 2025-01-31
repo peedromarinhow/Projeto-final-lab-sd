@@ -3,9 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity datapath is
-  generic (
-    num_floors : integer := 10
-  );
   port (
     reset : in std_logic;
     clock : in std_logic;
@@ -14,12 +11,17 @@ entity datapath is
     called_floor  : in std_logic_vector(7 downto 0);
     current_floor : in std_logic_vector(7 downto 0);
 
+    door_is_obstructed_sensor        : in std_logic;
     door_closed_end_of_travel_sensor : in std_logic;
     door_open_end_of_travel_sensor   : in std_logic;
 
-    open_door     : out std_logic;
-    motor_forward : out std_logic;
-    motor_reverse : out std_logic;
+    hold_door_button  : in std_logic;
+    close_door_button : in std_logic;
+
+    at_floor_alarm_trigger : out std_logic;
+    open_door              : out std_logic;
+    motor_forward          : out std_logic;
+    motor_reverse          : out std_logic;
 
     debug_controller_state : out integer
   );
@@ -31,15 +33,15 @@ architecture rtl of datapath is
       frequency_hz : integer
     );
     port (
-      reset  : in std_logic;
-      clock  : in std_logic;
-      enable : in std_logic;
-      ended  : out std_logic
+      reset : in std_logic;
+      clock : in std_logic;
+      start : in std_logic;
+      ended : out std_logic
     );
   end component;
-  signal timer_reset_inter  : std_logic := '0';
-  signal timer_enable_inter : std_logic := '0';
-  signal timer_ended_inter  : std_logic := '0';
+  signal timer_reset_inter : std_logic := '0';
+  signal timer_start_inter : std_logic := '0';
+  signal timer_ended_inter : std_logic := '0';
 
   component comp is 
     generic (
@@ -61,26 +63,27 @@ architecture rtl of datapath is
       called_floor_eq_current : in std_logic;
       called_floor_gt_current : in std_logic;
 
-      open_door_timer_timeout  : in  std_logic;
-      open_door_timer_enable   : out std_logic;
-      open_door_timer_reset    : out std_logic;
+      open_door_timer_ended  : in  std_logic;
+      open_door_timer_start  : out std_logic;
+      open_door_timer_reset  : out std_logic;
 
-      door_closed_end_of_travel : in std_logic;
-      door_open_end_of_travel   : in std_logic;
+      door_is_obstructed_sensor        : in std_logic;
+      door_closed_end_of_travel_sensor : in std_logic;
+      door_open_end_of_travel_sensor   : in std_logic;
 
-      open_door     : out std_logic;
-      motor_forward : out std_logic;
-      motor_reverse : out std_logic;
+      hold_door_button  : in std_logic;
+      close_door_button : in std_logic;
+
+      at_floor_alarm_trigger : out std_logic;
+      open_door              : out std_logic;
+      motor_forward          : out std_logic;
+      motor_reverse          : out std_logic;
   
       debug_state : out integer
     );
   end component;
   signal controller_called_eq_current_input : std_logic := '0';
   signal controller_called_gt_current_input : std_logic := '0';
-
-  signal controller_open_door_output     : std_logic;
-  signal controller_motor_forward_output : std_logic;
-  signal controller_motor_reverse_output : std_logic;
 
   signal inv_reset : std_logic := '0';
 begin
@@ -90,12 +93,15 @@ begin
     generic map (duration_sec => 30, frequency_hz => 10)
     port map (timer_reset_inter,
               clock,
-              timer_enable_inter,
+              timer_start_inter,
               timer_ended_inter);
 
   comp_instance : comp
     generic map (8)
-    port map (called_floor, current_floor, controller_called_eq_current_input, controller_called_gt_current_input);
+    port map (called_floor,
+              current_floor,
+              controller_called_eq_current_input,
+              controller_called_gt_current_input);
 
   controller_instance : controller
     port map (reset,
@@ -106,21 +112,22 @@ begin
               controller_called_gt_current_input,
 
               timer_ended_inter,
-              timer_enable_inter,
+              timer_start_inter,
               timer_reset_inter,
 
+              door_is_obstructed_sensor,
               door_closed_end_of_travel_sensor,
               door_open_end_of_travel_sensor,
 
-              controller_open_door_output,
-              controller_motor_forward_output,
-              controller_motor_reverse_output,
+              hold_door_button,
+              close_door_button,
+
+              at_floor_alarm_trigger,
+              open_door,
+              motor_forward,
+              motor_reverse,
 
               debug_controller_state);
-
-  open_door     <= controller_open_door_output;
-  motor_forward <= controller_motor_forward_output;
-  motor_reverse <= controller_motor_reverse_output;
 end architecture;
 
 

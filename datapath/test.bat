@@ -12,7 +12,6 @@ pushd build
   ghdl -a ../../counter/counter.vhd
   ghdl -a ../../timer/timer.vhd
   ghdl -a ../../comp/comp.vhd
-  ghdl -a ../../sr_latch/sr_latch.vhd
   ghdl -a ../../controller/controller.vhd
   ghdl -e tb
   ghdl -r tb --vcd=%Src%.vcd

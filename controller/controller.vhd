@@ -10,16 +10,21 @@ entity controller is
     called_floor_eq_current : in std_logic;
     called_floor_gt_current : in std_logic;
 
-    open_door_timer_timeout  : in  std_logic;
-    open_door_timer_enable   : out std_logic;
-    open_door_timer_reset    : out std_logic;
+    open_door_timer_ended  : in  std_logic;
+    open_door_timer_start  : out std_logic;
+    open_door_timer_reset  : out std_logic;
 
-    door_closed_end_of_travel : in std_logic;
-    door_open_end_of_travel   : in std_logic;
+    door_is_obstructed_sensor        : in std_logic;
+    door_closed_end_of_travel_sensor : in std_logic;
+    door_open_end_of_travel_sensor   : in std_logic;
 
-    open_door     : out std_logic;
-    motor_forward : out std_logic;
-    motor_reverse : out std_logic;
+    hold_door_button  : in std_logic;
+    close_door_button : in std_logic;
+
+    at_floor_alarm_trigger : out std_logic;
+    open_door              : out std_logic;
+    motor_forward          : out std_logic;
+    motor_reverse          : out std_logic;
 
     debug_state : out integer
   );
@@ -31,12 +36,11 @@ architecture fsm of controller is
     state_waiting_closed,
     state_waiting_open,
 
+    state_start_open_door_timer,
+    state_trigger_at_floor_alarm,
+
     state_opening_door,
     state_closing_door,
-
-    state_deciding,
-
-    state_arrived,
 
     state_moving_up,
     state_moving_down
@@ -52,94 +56,113 @@ begin
     called_floor_eq_current,
     called_floor_gt_current,
 
-    open_door_timer_timeout,
+    open_door_timer_ended,
 
-    door_closed_end_of_travel,
-    door_open_end_of_travel
+    door_is_obstructed_sensor,
+    door_closed_end_of_travel_sensor,
+    door_open_end_of_travel_sensor,
+
+    hold_door_button,
+    close_door_button
   )
   begin
     case curr_state is
       when state_start =>
         next_state <= state_waiting_closed;
 
-        open_door_timer_enable <= '0';
+        open_door_timer_start  <= '0';
         open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
 
       when state_waiting_closed =>
         if was_called = '0' then
-          next_state <= state_waiting_closed;
+          if hold_door_button = '0' then
+            next_state <= state_waiting_closed;
+          else
+            next_state <= state_opening_door;
+          end if;
         else
-          next_state <= state_deciding;
+          if called_floor_eq_current = '1' then
+            next_state <= state_opening_door;
+          elsif called_floor_gt_current = '1' then
+            next_state <= state_moving_up;
+          else
+            next_state <= state_moving_down;
+          end if;
         end if;
 
-        open_door_timer_enable <= '0';
+        open_door_timer_start  <= '0';
         open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
 
       when state_waiting_open =>
-        if open_door_timer_timeout = '0' then
-          next_state <= state_waiting_open;
-        else
+        if open_door_timer_ended = '1' or close_door_button = '1' or was_called = '1' then
           next_state <= state_closing_door;
+        else
+          next_state <= state_waiting_open;
         end if;
 
-        open_door_timer_enable <= '1';
+        open_door_timer_start  <= '0';
         open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '1';
         motor_forward          <= '0';
         motor_reverse          <= '0';
 
+      when state_start_open_door_timer =>
+        next_state <= state_waiting_open;
+
+        open_door_timer_start  <= '1';
+        open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
+        open_door              <= '1';
+        motor_forward          <= '0';
+        motor_reverse          <= '0';
+
+      when state_trigger_at_floor_alarm =>
+        next_state <= state_opening_door;
+
+        open_door_timer_start  <= '0';
+        open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '1';
+        open_door              <= '0';
+        motor_forward          <= '0';
+        motor_reverse          <= '0';
+
       when state_opening_door =>
-        if door_open_end_of_travel = '0' then
+        if door_open_end_of_travel_sensor = '0' then
           next_state <= state_opening_door;
         else
-          next_state <= state_waiting_open;
+          next_state <= state_start_open_door_timer;
         end if;
 
-        open_door_timer_enable <= '0';
-        open_door_timer_reset  <= '1';
+        open_door_timer_start  <= '0';
+        open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '1';
         motor_forward          <= '0';
         motor_reverse          <= '0';
 
       when state_closing_door =>
-        if door_closed_end_of_travel = '0' then
-          next_state <= state_closing_door;
+        if door_closed_end_of_travel_sensor = '0' then
+          if door_is_obstructed_sensor = '1' or hold_door_button = '1' then
+            next_state <= state_opening_door;
+          else
+            next_state <= state_closing_door;
+          end if;
         else
           next_state <= state_waiting_closed;
         end if;
 
-        open_door_timer_enable <= '0';
-        open_door_timer_reset  <= '0';
-        open_door              <= '0';
-        motor_forward          <= '0';
-        motor_reverse          <= '0';
-
-      when state_deciding =>
-        if called_floor_eq_current = '1' then
-          next_state <= state_opening_door;
-        elsif called_floor_gt_current = '1' then
-          next_state <= state_moving_up;
-        else
-        next_state <= state_moving_down;
-        end if;
-
-        open_door_timer_enable <= '0';
-        open_door_timer_reset  <= '0';
-        open_door              <= '0';
-        motor_forward          <= '0';
-        motor_reverse          <= '0';
-
-      when state_arrived =>
-        next_state <= state_opening_door;
-
-        open_door_timer_enable <= '0';
-        open_door_timer_reset  <= '0';
+        open_door_timer_start  <= '0';
+        open_door_timer_reset  <= '1';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '0';
@@ -148,11 +171,12 @@ begin
         if called_floor_eq_current = '0' then
           next_state <= state_moving_up;
         else
-          next_state <= state_arrived;
+          next_state <= state_trigger_at_floor_alarm;
         end if;
 
-        open_door_timer_enable <= '0';
+        open_door_timer_start  <= '0';
         open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '0';
         motor_forward          <= '1';
         motor_reverse          <= '0';
@@ -161,11 +185,12 @@ begin
         if called_floor_eq_current = '0' then
           next_state <= state_moving_down;
         else
-          next_state <= state_arrived;
+          next_state <= state_trigger_at_floor_alarm;
         end if;
 
-        open_door_timer_enable <= '0';
+        open_door_timer_start  <= '0';
         open_door_timer_reset  <= '0';
+        at_floor_alarm_trigger <= '0';
         open_door              <= '0';
         motor_forward          <= '0';
         motor_reverse          <= '1';

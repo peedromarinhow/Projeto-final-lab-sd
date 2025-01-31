@@ -16,19 +16,23 @@ architecture test of tb is
     port (
       reset : in std_logic;
       clock : in std_logic;
-
+  
       was_called    : in std_logic;
       called_floor  : in std_logic_vector(7 downto 0);
       current_floor : in std_logic_vector(7 downto 0);
-
+  
+      door_is_obstructed_sensor        : in std_logic;
       door_closed_end_of_travel_sensor : in std_logic;
       door_open_end_of_travel_sensor   : in std_logic;
-
-      open_door : out std_logic;
-
-      motor_forward : out std_logic;
-      motor_reverse : out std_logic;
-
+  
+      hold_door_button  : in std_logic;
+      close_door_button : in std_logic;
+  
+      at_floor_alarm_trigger : out std_logic;
+      open_door              : out std_logic;
+      motor_forward          : out std_logic;
+      motor_reverse          : out std_logic;
+  
       debug_controller_state : out integer
     );
   end component;
@@ -37,19 +41,28 @@ architecture test of tb is
   signal called_floor_input  : std_logic_vector(7 downto 0) := (others => '0');
   signal current_floor_input : std_logic_vector(7 downto 0) := (others => '0');
 
+  signal door_is_obstructed_sensor_input        : std_logic := '0';
   signal door_closed_end_of_travel_sensor_input : std_logic := '0';
   signal door_open_end_of_travel_sensor_input   : std_logic := '0';
 
-  signal open_door_output : std_logic;
+  signal hold_door_button_input  : std_logic := '0';
+  signal close_door_button_input : std_logic := '0';
 
-  signal motor_forward_output : std_logic;
-  signal motor_reverse_output : std_logic;
+  signal at_floor_alarm_trigger_output : std_logic;
+  signal open_door_output              : std_logic;
+  signal motor_forward_output          : std_logic;
+  signal motor_reverse_output          : std_logic;
 
   signal debug_controller_state_output : integer;
 begin
-  run <= false after 5000 sec;
   clk <= not clk after (0.5/frq) * 1 sec when run;
   rst <= '1' after 1 sec;
+
+  door_is_obstructed_sensor_input <= '1' after 315 sec, '0' after 316 sec;
+  
+  hold_door_button_input  <= '1' after 125 sec, '0' after 126 sec,
+                             '1' after 165 sec, '0' after 166 sec;
+  close_door_button_input <= '1' after 120 sec, '0' after 121 sec;
 
   datapath_instance : datapath
     port map (rst,
@@ -59,11 +72,15 @@ begin
               called_floor_input,
               current_floor_input,
 
+              door_is_obstructed_sensor_input,
               door_closed_end_of_travel_sensor_input,
               door_open_end_of_travel_sensor_input,
 
-              open_door_output,
+              hold_door_button_input,
+              close_door_button_input,
 
+              at_floor_alarm_trigger_output,
+              open_door_output,
               motor_forward_output,
               motor_reverse_output,
 
@@ -80,9 +97,11 @@ begin
       was_called_input   <= '1' after 0 sec, '0' after 1 sec;
       called_floor_input <= std_logic_vector(to_unsigned(the_reqs(i), 8));
 
-      wait until debug_controller_state_output = 1;
-      wait for 60 sec;
+      wait until at_floor_alarm_trigger_output = '1';
+      wait for 120 sec;
     end loop;
+    wait for 60 sec;
+    run <= false;
     wait;
   end process;
 

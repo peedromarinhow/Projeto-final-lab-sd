@@ -7,26 +7,31 @@ entity datapath is
     reset : in std_logic;
     clock : in std_logic;
 
-    was_called    : in std_logic;
     called_floor  : in std_logic_vector(7 downto 0);
     current_floor : in std_logic_vector(7 downto 0);
 
-    door_is_obstructed_sensor        : in std_logic;
-    door_closed_end_of_travel_sensor : in std_logic;
-    door_open_end_of_travel_sensor   : in std_logic;
+    sensor_inputs : in std_logic_vector(3 downto 0);
+    button_inputs : in std_logic_vector(1 downto 0);
 
-    hold_door_button  : in std_logic;
-    close_door_button : in std_logic;
+    outputs : out std_logic_vector(3 downto 0);
 
-    at_floor_alarm_trigger : out std_logic;
-    open_door              : out std_logic;
-    motor_forward          : out std_logic;
-    motor_reverse          : out std_logic;
-
-    debug_controller_state : out integer
+    debug_controller_state : out string(1 to 255)
   );
 end entity;
 architecture rtl of datapath is
+  alias was_called                       : std_logic is sensor_inputs(0);
+  alias door_is_obstructed_sensor        : std_logic is sensor_inputs(1);
+  alias door_closed_end_of_travel_sensor : std_logic is sensor_inputs(2);
+  alias door_open_end_of_travel_sensor   : std_logic is sensor_inputs(3);
+
+  alias hold_door_button  : std_logic is button_inputs(0);
+  alias close_door_button : std_logic is button_inputs(1);
+
+  alias at_floor_alarm_trigger : std_logic is outputs(0);
+  alias open_door              : std_logic is outputs(1);
+  alias motor_forward          : std_logic is outputs(2);
+  alias motor_reverse          : std_logic is outputs(3);
+
   component timer is
     generic (
       duration_sec : integer;
@@ -48,7 +53,7 @@ architecture rtl of datapath is
       data_width : natural := 16
     );
     port  (
-      a, b  : in std_logic_vector((data_width-1) downto 0);
+      a, b : in std_logic_vector((data_width-1) downto 0);
       eq : out std_logic;
       bt : out std_logic
     );
@@ -79,7 +84,7 @@ architecture rtl of datapath is
       motor_forward          : out std_logic;
       motor_reverse          : out std_logic;
   
-      debug_state : out integer
+      debug_state : out string(1 to 255)
     );
   end component;
   signal controller_called_eq_current_input : std_logic := '0';

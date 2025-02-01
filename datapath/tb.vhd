@@ -17,43 +17,40 @@ architecture test of tb is
       reset : in std_logic;
       clock : in std_logic;
   
-      was_called    : in std_logic;
       called_floor  : in std_logic_vector(7 downto 0);
       current_floor : in std_logic_vector(7 downto 0);
   
-      door_is_obstructed_sensor        : in std_logic;
-      door_closed_end_of_travel_sensor : in std_logic;
-      door_open_end_of_travel_sensor   : in std_logic;
+      sensor_inputs : in std_logic_vector(3 downto 0);
+      button_inputs : in std_logic_vector(1 downto 0);
   
-      hold_door_button  : in std_logic;
-      close_door_button : in std_logic;
+      outputs : out std_logic_vector(3 downto 0);
   
-      at_floor_alarm_trigger : out std_logic;
-      open_door              : out std_logic;
-      motor_forward          : out std_logic;
-      motor_reverse          : out std_logic;
-  
-      debug_controller_state : out integer
+      debug_controller_state : out string(1 to 255)
     );
   end component;
 
-  signal was_called_input    : std_logic := '0';
   signal called_floor_input  : std_logic_vector(7 downto 0) := (others => '0');
   signal current_floor_input : std_logic_vector(7 downto 0) := (others => '0');
 
-  signal door_is_obstructed_sensor_input        : std_logic := '0';
-  signal door_closed_end_of_travel_sensor_input : std_logic := '0';
-  signal door_open_end_of_travel_sensor_input   : std_logic := '0';
+  signal sensor_inputs_vector : std_logic_vector(3 downto 0) := (others => '0');
+  signal button_inputs_vector : std_logic_vector(1 downto 0) := (others => '0');
 
-  signal hold_door_button_input  : std_logic := '0';
-  signal close_door_button_input : std_logic := '0';
+  signal outputs_vector : std_logic_vector(3 downto 0) := (others => '0');
 
-  signal at_floor_alarm_trigger_output : std_logic;
-  signal open_door_output              : std_logic;
-  signal motor_forward_output          : std_logic;
-  signal motor_reverse_output          : std_logic;
+  alias was_called_input                       : std_logic is sensor_inputs_vector(0);
+  alias door_is_obstructed_sensor_input        : std_logic is sensor_inputs_vector(1);
+  alias door_closed_end_of_travel_sensor_input : std_logic is sensor_inputs_vector(2);
+  alias door_open_end_of_travel_sensor_input   : std_logic is sensor_inputs_vector(3);
 
-  signal debug_controller_state_output : integer;
+  alias hold_door_button_input  : std_logic is button_inputs_vector(0);
+  alias close_door_button_input : std_logic is button_inputs_vector(1);
+
+  alias at_floor_alarm_trigger_output : std_logic is outputs_vector(0);
+  alias open_door_output              : std_logic is outputs_vector(1);
+  alias motor_forward_output          : std_logic is outputs_vector(2);
+  alias motor_reverse_output          : std_logic is outputs_vector(3);
+
+  signal debug_controller_state_output : string(1 to 255);
 begin
   clk <= not clk after (0.5/frq) * 1 sec when run;
   rst <= '1' after 1 sec;
@@ -68,21 +65,13 @@ begin
     port map (rst,
               clk,
 
-              was_called_input,
               called_floor_input,
               current_floor_input,
 
-              door_is_obstructed_sensor_input,
-              door_closed_end_of_travel_sensor_input,
-              door_open_end_of_travel_sensor_input,
+              sensor_inputs_vector,
+              button_inputs_vector,
 
-              hold_door_button_input,
-              close_door_button_input,
-
-              at_floor_alarm_trigger_output,
-              open_door_output,
-              motor_forward_output,
-              motor_reverse_output,
+              outputs_vector,
 
               debug_controller_state_output);
 

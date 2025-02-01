@@ -14,6 +14,6 @@ pushd build
   ghdl -a ../../comp/comp.vhd
   ghdl -a ../../controller/controller.vhd
   ghdl -e tb
-  ghdl -r tb --vcd=%Src%.vcd
-  if %ERRORLEVEL% equ 0 gtkwave %Src%.vcd
+  ghdl -r tb --wave=%Src%.ghw
+  if %ERRORLEVEL% equ 0 gtkwave %Src%.ghw
 popd

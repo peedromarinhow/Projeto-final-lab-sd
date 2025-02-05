@@ -23,9 +23,7 @@ architecture test of tb is
       sensor_inputs : in std_logic_vector(3 downto 0);
       button_inputs : in std_logic_vector(1 downto 0);
   
-      outputs : out std_logic_vector(3 downto 0);
-  
-      debug_controller_state : out string(1 to 255)
+      outputs : out std_logic_vector(3 downto 0)
     );
   end component;
 
@@ -49,8 +47,6 @@ architecture test of tb is
   alias open_door_output              : std_logic is outputs_vector(1);
   alias motor_forward_output          : std_logic is outputs_vector(2);
   alias motor_reverse_output          : std_logic is outputs_vector(3);
-
-  signal debug_controller_state_output : string(1 to 255);
 begin
   clk <= not clk after (0.5/frq) * 1 sec when run;
   rst <= '1' after 1 sec;
@@ -71,9 +67,7 @@ begin
               sensor_inputs_vector,
               button_inputs_vector,
 
-              outputs_vector,
-
-              debug_controller_state_output);
+              outputs_vector);
 
   process
     type int_arr is array (integer range <>) of integer;

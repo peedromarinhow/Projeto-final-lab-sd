@@ -1,5 +1,5 @@
 $date
-  Tue Jan 28 15:17:14 2025
+  Tue Feb 04 21:18:28 2025
 $end
 $version
   GHDL v0
@@ -17,7 +17,7 @@ $scope module tb $end
 $var reg 1 ! run $end
 $var reg 1 " rst $end
 $var reg 1 # clk $end
-$var reg 16 $ count_input[15:0] $end
+$var reg 16 $ count_output[15:0] $end
 $scope module counter_instance $end
 $var reg 1 % reset $end
 $var reg 1 & clock $end

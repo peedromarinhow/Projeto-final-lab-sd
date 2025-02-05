@@ -24,9 +24,7 @@ entity controller is
     at_floor_alarm_trigger : out std_logic;
     open_door              : out std_logic;
     motor_forward          : out std_logic;
-    motor_reverse          : out std_logic;
-
-    debug_state : out string(1 to 255)
+    motor_reverse          : out std_logic
   );
 end entity;
 architecture fsm of controller is
@@ -48,11 +46,6 @@ architecture fsm of controller is
 
   signal curr_state : state := state_start;
   signal next_state : state;
-
-  function string_pad(s: string; w : integer := debug_state'length) return string is
-  begin
-    return s & (1 to w - s'length => ' ');
-  end function;
 begin
   process (
     curr_state,
@@ -210,20 +203,5 @@ begin
     elsif rising_edge(clock) then
       curr_state <= next_state;
     end if;
-  end process;
-
-  process (curr_state)
-  begin
-    case curr_state is
-      when state_start                  => debug_state <= string_pad("start");
-      when state_waiting_closed         => debug_state <= string_pad("waiting_closed");
-      when state_waiting_open           => debug_state <= string_pad("waiting_open");
-      when state_start_open_door_timer  => debug_state <= string_pad("start_open_door_timer");
-      when state_trigger_at_floor_alarm => debug_state <= string_pad("trigger_at_floor_alarm");
-      when state_opening_door           => debug_state <= string_pad("opening_door");
-      when state_closing_door           => debug_state <= string_pad("closing_door");
-      when state_moving_up              => debug_state <= string_pad("moving_up");
-      when state_moving_down            => debug_state <= string_pad("moving_down");
-    end case;
   end process;
 end architecture;

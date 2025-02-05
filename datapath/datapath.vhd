@@ -13,9 +13,7 @@ entity datapath is
     sensor_inputs : in std_logic_vector(3 downto 0);
     button_inputs : in std_logic_vector(1 downto 0);
 
-    outputs : out std_logic_vector(3 downto 0);
-
-    debug_controller_state : out string(1 to 255)
+    outputs : out std_logic_vector(3 downto 0)
   );
 end entity;
 architecture rtl of datapath is
@@ -82,9 +80,7 @@ architecture rtl of datapath is
       at_floor_alarm_trigger : out std_logic;
       open_door              : out std_logic;
       motor_forward          : out std_logic;
-      motor_reverse          : out std_logic;
-  
-      debug_state : out string(1 to 255)
+      motor_reverse          : out std_logic
     );
   end component;
   signal controller_called_eq_current_input : std_logic := '0';
@@ -130,9 +126,7 @@ begin
               at_floor_alarm_trigger,
               open_door,
               motor_forward,
-              motor_reverse,
-
-              debug_controller_state);
+              motor_reverse);
 end architecture;
 
 
